@@ -1,0 +1,26 @@
+body {
+    color: white;
+    background-color: black;
+}
+
+#url {
+    width: 50em;
+}
+
+#minutes {
+    width: 3em;
+}
+
+#list div {
+    padding: 1em;
+    border: solid white 2px;
+    margin: 1em;
+}
+
+.list-url {
+    color: green;
+}
+
+.list-mins, .list-count {
+    color: red;
+}

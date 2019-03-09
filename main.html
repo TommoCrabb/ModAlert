@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <audio id="audio" controls loop>
+            <source src="alarm.mp3" type="audio/mp3">
+        </audio><br />
+        Add URL:
+        <input type="url" id="url" pattern="https?://.*" placeholder="Enter URL"></input><br />
+        Check every <input type="number" id="minutes" value="15"></input> minutes.
+        <button type="button" id="add">Add</button>
+        <button type="button" id="test">Test</button>
+        <div id="list"></div>
+    </body>
+    <script src="main.js"></script>
+</html>

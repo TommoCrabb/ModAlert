@@ -1,0 +1,30 @@
+{
+
+	"manifest_version": 2,
+	"name": "ModAlert",
+	"version": "1.0",
+
+	"description": "Get notified when a page's modification time has changed.",
+
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "{97e41f74-544e-4093-ae0d-7c005aa35595}"
+		}
+	},
+
+	"permissions": [
+		"<all_urls>",
+		"notifications"
+	],
+
+	"background": {
+		"scripts": [
+			"background.js"
+		]
+	},
+	
+	"browser_action": {
+		"default_title": "ModAlert"
+	}
+
+}
