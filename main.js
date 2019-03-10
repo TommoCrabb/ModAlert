@@ -2,7 +2,6 @@ const urlRegx = /^https?:\/\/.*$/;
 const list = document.getElementById("list");
 const inpUrl = document.getElementById("url");
 const inpMin = document.getElementById("minutes");
-var time = "";
 
 function addEntry(event) {
     let url = inpUrl.value;
@@ -28,6 +27,7 @@ function addEntry(event) {
     "Last checked <span class='list-count'>0</span> minutes ago. ";
     entry.setAttribute("data-url", url);
     entry.setAttribute("data-mins", mins);
+    entry.setAttribute("data-last-mod-time", "");
     list.appendChild(entry);
     let count = entry.getElementsByClassName("list-count")[0];
     
@@ -50,7 +50,7 @@ function addEntry(event) {
     let check = makeButton(entry, "Check Now");
     check.addEventListener("click", event => {
         count.textContent = "0";  
-        fetchUrl(url);
+        fetchUrl(entry, url);
     })
 }
 
@@ -66,7 +66,7 @@ function makeTimer(entry, count, mins, url) {
         count.textContent = countVal + 1;
     } else {
         count.textContent = "0";
-        fetchUrl(url);
+        fetchUrl(entry, url);
     }
 }
 
@@ -78,17 +78,18 @@ function makeButton(parent, label) {
     return button;
 }
 
-function fetchUrl(url) {
+function fetchUrl(entry, url) {
     console.log(">>> Fetching URL:", url);
     fetch(url)
         .then(res => {
+            let time = entry.getAttribute("data-last-mod-time");
             res.headers.forEach((value, key, parent) => {
                 if (key === "last-modified") {
                     console.log(time, ">>>", value);
                     if (value !== time && time !== "") {
                         raiseAlarm();
                     }
-                    time = value;
+                    entry.setAttribute("data-last-mod-time", value);
                 }
             })
         })
