@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script>
+            const acon = new AudioContext();
+            const int = 3000;
+            var volume,
+                alarm;
+            
+            function makeAlarm() {
+                clearAlarm();
+                alarm = window.setInterval(makeSound, int); 
+            }
+            
+            function clearAlarm() {
+                window.clearInterval(alarm);
+            }
+
+            function makeSound(){
+                                
+                let gain = acon.createGain();
+                gain.connect(acon.destination);
+                gain.gain.setValueCurveAtTime([0, volume, (volume / 2), 0], acon.currentTime, 1)
+                
+                let osc = acon.createOscillator();
+                osc.connect(gain);
+                osc.type = "sine";
+                osc.frequency.value = 300;
+                osc.start();
+                osc.stop(acon.currentTime + 1);            
+            }
+
+            function setVol(){               
+                volume = Number(document.getElementById("volume").value) / 100;
+                console.log(">>> Volume set to", volume);
+            }
+            
+        </script>
+    </head>
+    <body onload="setVol()">
+        <button type="button" onclick="makeAlarm()">PLAY</button>
+        <button type="button" onclick="clearAlarm()">STOP</button>
+        Volume: <input id="volume" type="range" value="100" max="100" min="0" step="5" onchange="setVol()"></input>
+    </body>
+</html>

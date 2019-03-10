@@ -1,8 +1,4 @@
-const urlRegx = /^https?:\/\/.*$/;
-const list = document.getElementById("list");
-const inpUrl = document.getElementById("url");
-const inpMin = document.getElementById("minutes");
-var time = "";
+// FUNCTIONS
 
 function addEntry(event) {
     let url = inpUrl.value;
@@ -28,6 +24,7 @@ function addEntry(event) {
     "Last checked <span class='list-count'>0</span> minutes ago. ";
     entry.setAttribute("data-url", url);
     entry.setAttribute("data-mins", mins);
+    entry.setAttribute("data-last-mod-time", "");
     list.appendChild(entry);
     let count = entry.getElementsByClassName("list-count")[0];
     
@@ -50,7 +47,7 @@ function addEntry(event) {
     let check = makeButton(entry, "Check Now");
     check.addEventListener("click", event => {
         count.textContent = "0";  
-        fetchUrl(url);
+        fetchUrl(entry, url);
     })
 }
 
@@ -66,7 +63,7 @@ function makeTimer(entry, count, mins, url) {
         count.textContent = countVal + 1;
     } else {
         count.textContent = "0";
-        fetchUrl(url);
+        fetchUrl(entry, url);
     }
 }
 
@@ -78,17 +75,18 @@ function makeButton(parent, label) {
     return button;
 }
 
-function fetchUrl(url) {
+function fetchUrl(entry, url) {
     console.log(">>> Fetching URL:", url);
     fetch(url)
         .then(res => {
+            let time = entry.getAttribute("data-last-mod-time")
             res.headers.forEach((value, key, parent) => {
                 if (key === "last-modified") {
                     console.log(time, ">>>", value);
                     if (value !== time && time !== "") {
                         raiseAlarm();
                     }
-                    time = value;
+                    entry.setAttribute("data-last-mod-time", value);
                 }
             })
         })
@@ -97,22 +95,63 @@ function fetchUrl(url) {
         });
 }
 
-function raiseAlarm() {
-    console.log(">>> SOUND THE ALARM!");
+function showNotification() {
     browser.notifications.create(
         "myID",
         {
             "type" : "basic",
-            "title" : "UPDATE!",
+            "title" : "MOD-ALERT",
             "message" : "A feed was updated."
         }
     )
-    audio.play();
 }
 
+function setVol(){               
+    volume = Number(document.getElementById("volume").value) / 100;
+    console.log(">>> Volume set to", volume);
+}
+
+function raiseAlarm() {
+    clearAlarm();
+    alarm = window.setInterval(makeSound, int); 
+}
+
+function clearAlarm() {
+    window.clearInterval(alarm);
+}
+
+function makeSound(){
+    showNotification();
+                    
+    let gain = acon.createGain();
+    gain.connect(acon.destination);
+    gain.gain.setValueCurveAtTime([0, volume, (volume / 2), 0], acon.currentTime, 1)
+    
+    let osc = acon.createOscillator();
+    osc.connect(gain);
+    osc.type = "sine";
+    osc.frequency.value = 300;
+    osc.start();
+    osc.stop(acon.currentTime + 1);            
+}
+
+// VARIABLES
+var volume, alarm;
+var acon = new AudioContext();
+const int = 3000; // Milliseconds between alarm chimes
+
+const urlRegx = /^https?:\/\/.*$/;
+
+const list = document.getElementById("list");
+const inpUrl = document.getElementById("url");
+const inpMin = document.getElementById("minutes");
+
 document.getElementById("add").addEventListener("click", addEntry); 
-
 document.getElementById("test").addEventListener("click", raiseAlarm);
+document.getElementById("stop").addEventListener("click", clearAlarm);
+document.getElementById("volume").addEventListener("change", setVol);
 
-const audio = document.getElementById("audio");
+setVol();
+
+//const audio = document.getElementById("audio");
 
